@@ -5,10 +5,11 @@ import time
 
 from modules.common.mavlink.modules import flight_controller
 
-DELAY_TIME = 1.0  # seconds
-MISSION_PLANNER_ADDRESS = "tcp:127.0.0.1:14550"
 
-# Main Function
+MISSION_PLANNER_ADDRESS = "tcp:127.0.0.1:14550"
+DELAY_TIME = 1.0  # seconds
+
+
 def main() -> int:
     """
     Main function for LTE Communication code. Assumes that a mission has already been uploaded to 
@@ -38,9 +39,10 @@ def main() -> int:
 
     return 0
 
+
 if __name__ == "__main__":
-    result_run = main()
-    if result_run < 0:
-        print(f"ERROR: Status code: {result_run}")
+    result_main = main()
+    if result_main < 0:
+        print(f"ERROR: Status code: {result_main}")
 
     print("Done!")
