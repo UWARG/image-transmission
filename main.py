@@ -27,7 +27,7 @@ def main() -> int:
 
         if not result:
             print("Failed to poll flight controller.")
-            return -1
+            continue
 
         if is_mission_end:
             print("Exiting polling loop.")
