@@ -4,6 +4,7 @@ Entry point for LTE Communication.
 import time
 
 from modules.common.mavlink.modules import flight_controller
+from modules.common.camera.modules import camera_device
 
 
 MISSION_PLANNER_ADDRESS = "tcp:127.0.0.1:14550"
@@ -34,6 +35,17 @@ def main() -> int:
             break
 
         print("Drone's destination is not final waypoint.")
+
+        time.sleep(DELAY_TIME)
+
+    IMAGE_LOG_PREFIX = "log_image"
+    device = CameraDevice(0, 100, IMAGE_LOG_PREFIX)
+
+    while True:
+        result, image = device.get_image()
+        if not result:
+            print("Failed to get image")
+            continue
 
         time.sleep(DELAY_TIME)
 
