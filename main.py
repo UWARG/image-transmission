@@ -1,6 +1,7 @@
 """
 Entry point for LTE Communication.
 """
+
 import pathlib
 import time
 
@@ -18,7 +19,7 @@ DATA_COLLECTION_DELAY_TIME = 1.0  # seconds
 
 def main() -> int:
     """
-    Main function for LTE Communication code. Assumes that a mission has already been uploaded to 
+    Main function for LTE Communication code. Assumes that a mission has already been uploaded to
     the drone at MISSION_PLANNER_ADDRESS.
     """
     result, controller = flight_controller.FlightController.create(MISSION_PLANNER_ADDRESS)
@@ -35,6 +36,9 @@ def main() -> int:
             print("Failed to poll flight controller.")
             continue
 
+        # Get Pylance to stop complaining
+        assert is_mission_end is not None
+
         if is_mission_end:
             print("Exiting polling loop.")
             break
@@ -46,6 +50,8 @@ def main() -> int:
     camera = CameraDevice(0, 100, str(LOG_NAME))
 
     while True:
+        # TODO: image variable will be used further
+        # pylint: disable-next=unused-variable
         result, image = camera.get_image()
         if not result:
             print("Failed to get image")
