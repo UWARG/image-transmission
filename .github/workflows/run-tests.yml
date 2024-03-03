@@ -43,5 +43,6 @@ jobs:
           pylint .
 
       # Run unit tests with PyTest
-      - name: Run unit tests
-        run: pytest -vv
+      # TODO: Uncomment when there are unit tests to run
+      # - name: Run unit tests
+      #   run: pytest -vv
