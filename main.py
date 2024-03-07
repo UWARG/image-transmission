@@ -2,7 +2,10 @@
 Entry point for LTE Communication.
 """
 import pathlib
+import socket
 import time
+
+import image_encode
 
 from modules.common.camera.modules.camera_device import CameraDevice
 from modules.common.mavlink.modules import flight_controller
@@ -14,6 +17,11 @@ WAIT_LOOP_DELAY_TIME = 1.0  # seconds
 LOG_DIRECTORY_PATH = pathlib.Path("logs")
 LOG_NAME = pathlib.Path(LOG_DIRECTORY_PATH, "image")
 DATA_COLLECTION_DELAY_TIME = 1.0  # seconds
+
+IMAGE_ENCODE_EXT = ".png"
+
+SOCKET_HOST = "127.0.0.1"
+SOCKET_PORT = 8080
 
 
 def main() -> int:
@@ -45,12 +53,22 @@ def main() -> int:
 
     camera = CameraDevice(0, 100, str(LOG_NAME))
 
+    # TCP Connection, do we want UDP instead (socket.SOCK_DGRAM)?
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect(SOCKET_HOST, SOCKET_PORT)
+
     while True:
         result, image = camera.get_image()
         if not result:
             print("Failed to get image")
             continue
 
+        result, image_bytes = image_encode.encode_image_as_bytes(IMAGE_ENCODE_EXT, image)
+        if not result:
+            print(f"Failed to encode image as {IMAGE_ENCODE_EXT}")
+            continue
+
+        s.sendall(image_bytes)
         time.sleep(DATA_COLLECTION_DELAY_TIME)
 
     return 0
