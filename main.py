@@ -1,5 +1,5 @@
 """
-Entry point for LTE Communication.
+Entry point for LTE Communication. Assumes that a mission has already been uploaded to the drone.
 """
 
 import pathlib
@@ -19,8 +19,7 @@ DATA_COLLECTION_DELAY_TIME = 1.0  # seconds
 
 def main() -> int:
     """
-    Main function for LTE Communication code. Assumes that a mission has already been uploaded to
-    the drone at MISSION_PLANNER_ADDRESS.
+    Main function.
     """
     result, controller = flight_controller.FlightController.create(MISSION_PLANNER_ADDRESS)
     if not result:
