@@ -5,6 +5,8 @@ import pathlib
 import time
 
 from modules.common.camera.modules.camera_device import CameraDevice
+from modules.common.lte.image_encode import image_encode
+from modules.common.lte import socket_wrapper
 from modules.common.mavlink.modules import flight_controller
 
 
@@ -14,6 +16,11 @@ WAIT_LOOP_DELAY_TIME = 1.0  # seconds
 LOG_DIRECTORY_PATH = pathlib.Path("logs")
 LOG_NAME = pathlib.Path(LOG_DIRECTORY_PATH, "image")
 DATA_COLLECTION_DELAY_TIME = 1.0  # seconds
+
+SOCKET_CREATE_MAX_ATTEMPTS = 10
+SOCKET_CONNECT_MAX_ATTEMPTS = 10
+SOCKET_HOST = "127.0.0.1"
+SOCKET_PORT = 8080
 
 
 def main() -> int:
@@ -45,11 +52,28 @@ def main() -> int:
 
     camera = CameraDevice(0, 100, str(LOG_NAME))
 
+    result, socket_instance = socket_wrapper.Socket.create(
+        SOCKET_HOST, SOCKET_PORT, SOCKET_CREATE_MAX_ATTEMPTS, SOCKET_CONNECT_MAX_ATTEMPTS
+    )
+
+    if not result:
+        print("Max attempts reached, could not create or connect socket.")
+        return -1
+
     while True:
         result, image = camera.get_image()
         if not result:
-            print("Failed to get image")
+            print("Failed to get image.")
             continue
+
+        result, image_bytes = image_encode(image)
+        if not result:
+            print("Failed to encode image.")
+            continue
+
+        result = socket_instance.send(image_bytes)
+        if not result:
+            print("Failed to send image byte data over socket.")
 
         time.sleep(DATA_COLLECTION_DELAY_TIME)
 
